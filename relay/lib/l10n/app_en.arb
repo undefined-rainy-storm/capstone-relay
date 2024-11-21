@@ -1,0 +1,15 @@
+{
+  "enumConnectionStateConnected": "Connected",
+  "enumConnectionStateConnecting": "Connecting",
+  "enumConnectionStateDisconnected": "Disconnected",
+  "enumConnectionStateTimeout": "Timeout",
+  "enumConnectionStateError": "Error",
+  "displayConnectionStateLastConnection": "Latest handshake: {time}",
+  "@displayConnectionStateLastConnection": {
+    "placeholders": {
+      "time": {
+        "type": "int"
+      }
+    }
+  }
+}
