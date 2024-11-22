@@ -19,37 +19,41 @@ class _ConnectionStateWidgetState extends State<ConnectionStateWidget> {
   Widget build(BuildContext context) {
     return Container(
         child: Column(
-      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Text(widget.target.name, style: TextStyle(fontSize: 16)),
-              const SizedBox(width: 8),
-              Chip(
-                  avatar: Icon(
-                    Icons.fiber_manual_record,
-                    color: widget.connectionStatus == ConnectionStatus.connected
-                        ? Colors.green
-                        : Colors.red,
-                  ),
-                  label: Text(switch (widget.connectionStatus) {
-                    ConnectionStatus.connected => AppLocalizations.of(context)!
-                        .enumConnectionStateConnected,
-                    ConnectionStatus.connecting => AppLocalizations.of(context)!
-                        .enumConnectionStateConnecting,
-                    ConnectionStatus.disconnected =>
-                      AppLocalizations.of(context)!
-                          .enumConnectionStateDisconnected,
-                    ConnectionStatus.timeout =>
-                      AppLocalizations.of(context)!.enumConnectionStateTimeout,
-                    _ => AppLocalizations.of(context)!.enumConnectionStateError
-                  })),
-            ]),
+        Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+          Text(
+            widget.target.name,
+            style: TextStyle(fontSize: 16),
+            textAlign: TextAlign.left,
+          ),
+          const SizedBox(width: 8),
+          Chip(
+              avatar: Icon(
+                Icons.fiber_manual_record,
+                color: widget.connectionStatus == ConnectionStatus.connected
+                    ? Colors.green
+                    : Colors.red,
+              ),
+              label: Text(switch (widget.connectionStatus) {
+                ConnectionStatus.connected =>
+                  AppLocalizations.of(context)!.enumConnectionStateConnected,
+                ConnectionStatus.connecting =>
+                  AppLocalizations.of(context)!.enumConnectionStateConnecting,
+                ConnectionStatus.disconnected =>
+                  AppLocalizations.of(context)!.enumConnectionStateDisconnected,
+                ConnectionStatus.timeout =>
+                  AppLocalizations.of(context)!.enumConnectionStateTimeout,
+                _ => AppLocalizations.of(context)!.enumConnectionStateError
+              })),
+        ]),
         const SizedBox(height: 3),
-        Text(widget.target.address),
+        Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              widget.target.address,
+              textAlign: TextAlign.left,
+            )),
       ],
     ));
   }

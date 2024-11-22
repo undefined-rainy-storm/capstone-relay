@@ -47,49 +47,54 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+            leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.of(context).pop(),
+        )),
         body: SafeArea(
-      child: Center(
-          child: StreamBuilder<bool>(
-              stream: FlutterBluePlus.isScanning,
-              initialData: false,
-              builder: (context, snapshot) {
-                final bool isScanning = snapshot.data ?? false;
-                return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                          'Bluetooth ${devices.length} device${devices.length == 1 ? '' : 's'} found.'),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: devices.length,
-                          itemBuilder: (context, index) {
-                            final BluetoothDevice device = devices[index];
-                            return ListTile(
-                              title: Text(
-                                device.advName.isNotEmpty
-                                    ? device.advName
-                                    : 'Unknown',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              subtitle: Text(
-                                device.remoteId.toString(),
-                                style: TextStyle(fontSize: 12),
-                              ),
-                              onTap: () {
-                                Navigator.of(context).pop(device);
+          child: Center(
+              child: StreamBuilder<bool>(
+                  stream: FlutterBluePlus.isScanning,
+                  initialData: false,
+                  builder: (context, snapshot) {
+                    final bool isScanning = snapshot.data ?? false;
+                    return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                              'Bluetooth ${devices.length} device${devices.length == 1 ? '' : 's'} found.'),
+                          const SizedBox(height: 10),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: devices.length,
+                              itemBuilder: (context, index) {
+                                final BluetoothDevice device = devices[index];
+                                return ListTile(
+                                  title: Text(
+                                    device.advName.isNotEmpty
+                                        ? device.advName
+                                        : 'Unknown',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  subtitle: Text(
+                                    device.remoteId.toString(),
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  onTap: () {
+                                    Navigator.of(context).pop(device);
+                                  },
+                                );
                               },
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: isScanning ? null : _scanDevices,
-                        child: Text(isScanning ? 'Scanning...' : 'Scan'),
-                      ),
-                    ]);
-              })),
-    ));
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: isScanning ? null : _scanDevices,
+                            child: Text(isScanning ? 'Scanning...' : 'Scan'),
+                          ),
+                        ]);
+                  })),
+        ));
   }
 }

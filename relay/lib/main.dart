@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import 'package:relay/l10n/app_localizations.dart';
+import 'package:relay/models/classes/serializables/config.dart';
 import 'package:relay/screens/entry.dart';
 import 'package:relay/screens/select_ble_device.dart';
 
+GetIt getIt = GetIt.instance;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  getIt.registerSingleton<Config>(await Config.fromSharedPrefs());
   // await BLEForegroundService.initialize();
 
   runApp(MaterialApp(
@@ -16,6 +21,6 @@ void main() async {
     ),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
-    home: const SelectBleDeviceScreen(),
+    home: const EntryScreen(),
   ));
 }
