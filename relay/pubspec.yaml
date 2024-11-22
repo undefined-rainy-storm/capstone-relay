@@ -41,6 +41,8 @@ dependencies:
     sdk: flutter
   intl: any
   get_it: ^8.0.2
+  qr_code_scanner: ^1.0.1
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:

@@ -1,7 +1,8 @@
 import 'package:relay/models/classes/extensions/json_serialized_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:relay/models/classes/serializables/config.dart';
+import 'package:relay/consts/defaults.dart' as defaults;
+import 'package:relay/consts/serialized_keys.dart' as sk;
 
 class JsonSerializedKeysConnectionConfig {
   static const glassRemoteId = 'glass_remote_id';
@@ -18,15 +19,14 @@ class ConnectionConfig {
   static Future<ConnectionConfig> fromSharedPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     return ConnectionConfig(
-      glassRemoteId: prefs.getString(jsonSerializedKeyConfig
-              .appendChild(JsonSerializedKeysConfig.connectionConfig)
-              .appendChild(JsonSerializedKeysConnectionConfig.glassRemoteId)) ??
-          '',
-      processorAddress: prefs.getString(jsonSerializedKeyConfig
-              .appendChild(JsonSerializedKeysConfig.connectionConfig)
-              .appendChild(
-                  JsonSerializedKeysConnectionConfig.processorAddress)) ??
-          '',
+      glassRemoteId: prefs.getString(sk.config
+              .appendChild(sk.Config.connectionConfig)
+              .appendChild(sk.ConnectionConfig.glassRemoteId)) ??
+          defaults.ConnectionConfig.glassRemoteId,
+      processorAddress: prefs.getString(sk.config
+              .appendChild(sk.Config.connectionConfig)
+              .appendChild(sk.ConnectionConfig.processorAddress)) ??
+          defaults.ConnectionConfig.processorAddress,
     );
   }
 

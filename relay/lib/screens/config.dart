@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:relay/l10n/app_localizations.dart';
 import 'package:relay/models/classes/serializables/config.dart';
 import 'package:relay/screens/load_qr_config.dart';
 import 'package:relay/screens/select_ble_device.dart';
@@ -62,14 +63,17 @@ class _ConfigScreenState extends State<ConfigScreen> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  const Text('Connection'),
+                  Text(AppLocalizations.of(context)!
+                      .configScreen_subtitleConnection),
                   Column(
                     children: [
-                      const Text('Glass Remote ID'),
+                      Text(AppLocalizations.of(context)!
+                          .configScreen_glassRemoteIdLabel),
                       TextField(
                         controller: _connectionConfigGlassRemoteIdController,
                         decoration: InputDecoration(
-                            hintText: 'Glass Remote ID',
+                            hintText: AppLocalizations.of(context)!
+                                .configScreen_glassRemoteIdHint,
                             suffixIcon: IconButton(
                                 onPressed: () {
                                   _navigateAndDisplaySelectBleDeviceScreen(
@@ -81,11 +85,13 @@ class _ConfigScreenState extends State<ConfigScreen> {
                   ),
                   Column(
                     children: [
-                      const Text('Processor Address'),
+                      Text(AppLocalizations.of(context)!
+                          .configScreen_processorAddressLabel),
                       TextField(
                         controller: _connectionConfigProcessorAddress,
-                        decoration:
-                            InputDecoration(hintText: 'Processor Address'),
+                        decoration: InputDecoration(
+                            hintText: AppLocalizations.of(context)!
+                                .configScreen_processorAddressHint),
                       ),
                     ],
                   )
@@ -94,7 +100,9 @@ class _ConfigScreenState extends State<ConfigScreen> {
               const SizedBox(height: 10),
               Row(children: [
                 ElevatedButton(
-                    onPressed: _saveButtonOnPressed, child: Text('Save')),
+                    onPressed: _saveButtonOnPressed,
+                    child: Text(AppLocalizations.of(context)!
+                        .configScreen_saveButtonText)),
                 SizedBox(
                   width: 10,
                 ),
@@ -102,7 +110,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
                     onPressed: () {
                       _navigateAndDisplayLoadQrConfigScreen(context);
                     },
-                    child: Text('Load using QR code')),
+                    child: Text(AppLocalizations.of(context)!
+                        .configScreen_loadQrConfigButtonText)),
               ])
             ],
           ),

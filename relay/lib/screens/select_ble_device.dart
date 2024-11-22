@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:relay/l10n/app_localizations.dart';
 
 class SelectBleDeviceScreen extends StatefulWidget {
   const SelectBleDeviceScreen({super.key});
@@ -62,8 +63,9 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
                     return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text(
-                              'Bluetooth ${devices.length} device${devices.length == 1 ? '' : 's'} found.'),
+                          Text(AppLocalizations.of(context)!
+                              .selectBleDeviceScreen_bluetoothDevicesFound(
+                                  devices.length)),
                           const SizedBox(height: 10),
                           Expanded(
                             child: ListView.builder(
@@ -74,7 +76,8 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
                                   title: Text(
                                     device.advName.isNotEmpty
                                         ? device.advName
-                                        : 'Unknown',
+                                        : AppLocalizations.of(context)!
+                                            .selectBleDeviceScreen_unknownDeviceName,
                                     style: TextStyle(fontSize: 14),
                                   ),
                                   subtitle: Text(
@@ -91,7 +94,11 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
                           const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: isScanning ? null : _scanDevices,
-                            child: Text(isScanning ? 'Scanning...' : 'Scan'),
+                            child: Text(isScanning
+                                ? AppLocalizations.of(context)!
+                                    .selectBleDeviceScreen_scanButtonNowScanningText
+                                : AppLocalizations.of(context)!
+                                    .selectBleDeviceScreen_scanButtonText),
                           ),
                         ]);
                   })),

@@ -11,5 +11,34 @@
         "type": "int"
       }
     }
-  }
+  },
+  "configScreen_subtitleConnection": "Connection",
+  "configScreen_glassRemoteIdLabel": "Glass remote ID",
+  "configScreen_glassRemoteIdHint": "19B10000-E8F2-537E-4F6C-D104768A1214",
+  "configScreen_processorAddressLabel": "Processor address",
+  "configScreen_processorAddressHint": "http://localhost:5000",
+  "configScreen_loadQrConfigButtonText": "Scan QR code",
+  "configScreen_saveButtonText": "Save",
+  "loadQrConfigScreen_qrCodeResult": "QR code result: {result}",
+  "@loadQrConfigScreen_qrCodeResult": {
+    "placeholders": {
+      "result": {
+        "type": "String"
+      }
+    }
+  },
+  "loadQrConfigScreen_qrCodeResultIsEmpty": "Scan a code",
+  "selectBleDeviceScreen_bluetoothDevicesFound": "{count, plural, =1{Bluetooth 1 device found.} other{Bluetooth {count} devices found.}}",
+  "@selectBleDeviceScreen_bluetoothDevicesFound": {
+    "description": "Message showing number of bluetooth devices found",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "selectBleDeviceScreen_unknownDeviceName": "Unknown",
+  "selectBleDeviceScreen_scanButtonText": "Scan",
+  "selectBleDeviceScreen_scanButtonNowScanningText": "Scanning..."
 }
