@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:relay/l10n/app_localizations.dart';
 import 'package:relay/models/enums/connection_status.dart';
 import 'package:relay/models/classes/device.dart';
+import 'package:relay/consts/styles.dart' as styles;
 
 class ConnectionStateWidget extends StatefulWidget {
   final Device target;
@@ -31,9 +32,17 @@ class _ConnectionStateWidgetState extends State<ConnectionStateWidget> {
           Chip(
               avatar: Icon(
                 Icons.fiber_manual_record,
-                color: widget.connectionStatus == ConnectionStatus.connected
-                    ? Colors.green
-                    : Colors.red,
+                color: switch (widget.connectionStatus) {
+                  ConnectionStatus.connected =>
+                    styles.ConnectionStateWidget.chipColorConnected,
+                  ConnectionStatus.connecting =>
+                    styles.ConnectionStateWidget.chipColorConnecting,
+                  ConnectionStatus.disconnected =>
+                    styles.ConnectionStateWidget.chipColorDisconnected,
+                  ConnectionStatus.timeout =>
+                    styles.ConnectionStateWidget.chipColorTimeout,
+                  _ => styles.ConnectionStateWidget.chipColorDisconnected
+                },
               ),
               label: Text(switch (widget.connectionStatus) {
                 ConnectionStatus.connected =>
