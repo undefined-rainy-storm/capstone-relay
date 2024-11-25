@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:relay/l10n/app_localizations.dart';
-import 'package:relay/services/blue_handler.dart';
+import 'package:relay/widgets/select_ble_device/scan_result_tile.dart';
+import 'package:relay/widgets/select_ble_device/system_device_tile.dart';
 
 class SelectBleDeviceScreen extends StatefulWidget {
   const SelectBleDeviceScreen({super.key});
@@ -11,18 +14,116 @@ class SelectBleDeviceScreen extends StatefulWidget {
 }
 
 class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
-  final BlueHandler _blueHandler = BlueHandler();
+  List<BluetoothDevice> _systemDevices = [];
+  List<ScanResult> _scanResults = [];
+
+  bool _isScanning = false;
+
+  late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
+  late StreamSubscription<bool> _isScanningSubscription;
 
   @override
   void initState() {
     super.initState();
-    _blueHandler.clearDevices();
-    _blueHandler.scanDevices();
+
+    _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
+      _scanResults = results;
+      if (mounted) {
+        setState(() {});
+      }
+    }, onError: (e) {
+      print('Error: $e');
+    });
+
+    _isScanningSubscription = FlutterBluePlus.isScanning.listen((state) {
+      _isScanning = state;
+      if (mounted) {
+        setState(() {});
+      }
+    });
+
+    startScan();
   }
 
-  void _onDeviceSelected(BluetoothDevice device) {
-    _blueHandler.connectDevice(device);
-    Navigator.of(context).pop();
+  @override
+  void dispose() {
+    _scanResultsSubscription.cancel();
+    _isScanningSubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> _onRefresh() {
+    if (_isScanning == false) {
+      FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
+    }
+    if (mounted) {
+      setState(() {});
+    }
+    return Future.delayed(Duration(milliseconds: 500));
+  }
+
+  Future<void> startScan() async {
+    try {
+      // `withServices` is required on iOS for privacy purposes, ignored on android.
+      var withServices = [Guid("180f")]; // Battery Level Service
+      _systemDevices = await FlutterBluePlus.systemDevices(withServices);
+    } catch (e) {
+      print('error: $e');
+    }
+    try {
+      await FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
+    } catch (e) {
+      print('error $e');
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> stopScan() async {
+    try {
+      FlutterBluePlus.stopScan();
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> _onScanStartPressed() async => await startScan();
+
+  Future<void> _onScanStopPressed() async => await stopScan();
+
+  Widget _buildScanButton(BuildContext context) {
+    if (FlutterBluePlus.isScanningNow) {
+      return FloatingActionButton(
+        child: const Icon(Icons.stop),
+        onPressed: _onScanStopPressed,
+        backgroundColor: Colors.red,
+      );
+    } else {
+      return FloatingActionButton(
+          child: const Text("SCAN"), onPressed: _onScanStartPressed);
+    }
+  }
+
+  List<Widget> _buildSystemDeviceTiles(BuildContext context) {
+    return _systemDevices
+        .map(
+          (d) => SystemDeviceTileWidget(
+            device: d,
+            onOpen: () => {},
+            onConnect: () => {},
+          ),
+        )
+        .toList();
+  }
+
+  List<Widget> _buildScanResultTiles(BuildContext context) {
+    return _scanResults
+        .map((ScanResult result) => ScanResultTileWidget(
+              result: result,
+              onTap: () => {},
+            ))
+        .toList();
   }
 
   @override
@@ -35,65 +136,13 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
         ),
       ),
       body: SafeArea(
-        child: Center(
-          child: StreamBuilder<bool>(
-            stream: FlutterBluePlus.isScanning,
-            initialData: false,
-            builder: (context, scanningSnapshot) {
-              final bool isScanning = scanningSnapshot.data ?? false;
-
-              return StreamBuilder<List<BluetoothDevice>>(
-                stream: _blueHandler.devicesStream,
-                initialData: const [],
-                builder: (context, devicesSnapshot) {
-                  final devices = devicesSnapshot.data ?? [];
-
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(AppLocalizations.of(context)!
-                          .selectBleDeviceScreen_bluetoothDevicesFound(
-                              devices.length)),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: devices.length,
-                          itemBuilder: (context, index) {
-                            final device = devices[index];
-                            return ListTile(
-                              title: Text(
-                                device.advName.isNotEmpty
-                                    ? device.advName
-                                    : AppLocalizations.of(context)!
-                                        .selectBleDeviceScreen_unknownDeviceName,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                              subtitle: Text(
-                                device.remoteId.toString(),
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              onTap: () => _onDeviceSelected(device),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: isScanning ? null : _blueHandler.scanDevices,
-                        child: Text(isScanning
-                            ? AppLocalizations.of(context)!
-                                .selectBleDeviceScreen_scanButtonNowScanningText
-                            : AppLocalizations.of(context)!
-                                .selectBleDeviceScreen_scanButtonText),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-        ),
-      ),
+          child: RefreshIndicator(
+              child: ListView(children: <Widget>[
+                ..._buildSystemDeviceTiles(context),
+                ..._buildScanResultTiles(context),
+              ]),
+              onRefresh: _onRefresh)),
+      floatingActionButton: _buildScanButton(context),
     );
   }
 }

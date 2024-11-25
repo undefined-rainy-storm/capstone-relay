@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:relay/l10n/app_localizations.dart';
 import 'package:relay/models/classes/serializables/config.dart';
-import 'package:relay/screens/load_qr_config.dart';
 import 'package:relay/screens/select_ble_device.dart';
 
 class ConfigScreen extends StatefulWidget {
@@ -40,16 +39,6 @@ class _ConfigScreenState extends State<ConfigScreen> {
 
   void _saveButtonOnPressed() {}
 
-  Future<void> _navigateAndDisplayLoadQrConfigScreen(
-      BuildContext context) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LoadQrConfigScreen()),
-    );
-
-    if (!context.mounted) return;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,62 +48,51 @@ class _ConfigScreenState extends State<ConfigScreen> {
           onPressed: () => Navigator.of(context).pop(),
         )),
         body: SafeArea(
-          child: Column(
+            child: Column(children: <Widget>[
+          Column(
             children: <Widget>[
+              Text(AppLocalizations.of(context)!
+                  .configScreen_subtitleConnection),
               Column(
-                children: <Widget>[
+                children: [
                   Text(AppLocalizations.of(context)!
-                      .configScreen_subtitleConnection),
-                  Column(
-                    children: [
-                      Text(AppLocalizations.of(context)!
-                          .configScreen_glassRemoteIdLabel),
-                      TextField(
-                        controller: _connectionConfigGlassRemoteIdController,
-                        decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!
-                                .configScreen_glassRemoteIdHint,
-                            suffixIcon: IconButton(
-                                onPressed: () {
-                                  _navigateAndDisplaySelectBleDeviceScreen(
-                                      context);
-                                },
-                                icon: Icon(Icons.settings_bluetooth))),
-                      ),
-                    ],
+                      .configScreen_glassRemoteIdLabel),
+                  TextField(
+                    controller: _connectionConfigGlassRemoteIdController,
+                    decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!
+                            .configScreen_glassRemoteIdHint,
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              _navigateAndDisplaySelectBleDeviceScreen(context);
+                            },
+                            icon: Icon(Icons.settings_bluetooth))),
                   ),
-                  Column(
-                    children: [
-                      Text(AppLocalizations.of(context)!
-                          .configScreen_processorAddressLabel),
-                      TextField(
-                        controller: _connectionConfigProcessorAddress,
-                        decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!
-                                .configScreen_processorAddressHint),
-                      ),
-                    ],
-                  )
                 ],
               ),
-              const SizedBox(height: 10),
-              Row(children: [
-                ElevatedButton(
-                    onPressed: _saveButtonOnPressed,
-                    child: Text(AppLocalizations.of(context)!
-                        .configScreen_saveButtonText)),
-                SizedBox(
-                  width: 10,
-                ),
-                ElevatedButton(
-                    onPressed: () {
-                      _navigateAndDisplayLoadQrConfigScreen(context);
-                    },
-                    child: Text(AppLocalizations.of(context)!
-                        .configScreen_loadQrConfigButtonText)),
-              ])
+              Column(
+                children: [
+                  Text(AppLocalizations.of(context)!
+                      .configScreen_processorAddressLabel),
+                  TextField(
+                    controller: _connectionConfigProcessorAddress,
+                    decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!
+                            .configScreen_processorAddressHint),
+                  ),
+                ],
+              )
             ],
           ),
-        ));
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              ElevatedButton(
+                  onPressed: _saveButtonOnPressed,
+                  child: Text(AppLocalizations.of(context)!
+                      .configScreen_saveButtonText)),
+            ],
+          ),
+        ])));
   }
 }

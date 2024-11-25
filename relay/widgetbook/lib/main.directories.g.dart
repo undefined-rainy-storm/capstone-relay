@@ -14,6 +14,8 @@ import 'package:widgetbook_workspace/screens/config.dart' as _i2;
 import 'package:widgetbook_workspace/screens/entry.dart' as _i3;
 import 'package:widgetbook_workspace/screens/select_ble_device.dart' as _i4;
 import 'package:widgetbook_workspace/widgets/connection_state.dart' as _i5;
+import 'package:widgetbook_workspace/widgets/select_ble_device/scan_result_tile.dart'
+    as _i6;
 
 final directories = <_i1.WidgetbookNode>[
   _i1.WidgetbookFolder(
@@ -57,7 +59,19 @@ final directories = <_i1.WidgetbookNode>[
             builder: _i5.disconnectedUseCase,
           ),
         ],
-      )
+      ),
+      _i1.WidgetbookFolder(
+        name: 'select_ble_device',
+        children: [
+          _i1.WidgetbookLeafComponent(
+            name: 'ScanResultTileWidget',
+            useCase: _i1.WidgetbookUseCase(
+              name: 'Default',
+              builder: _i6.defaultUseCase,
+            ),
+          )
+        ],
+      ),
     ],
   ),
 ];
