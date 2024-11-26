@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:relay/consts/styles.dart';
 import 'package:relay/widgets/entry/device_connection_overview.dart';
 
 class EntryScreen extends StatefulWidget {
@@ -11,12 +12,15 @@ class EntryScreen extends StatefulWidget {
 class _EntryScreenState extends State<EntryScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+        appBar: AppBar(),
         body: SafeArea(
-            child: Column(
-      children: <Widget>[
-        DeviceConnectionOverviewWidget(),
-      ],
-    )));
+            child: Container(
+                margin: ScaffoldCommonOptions.rootBodyMargin,
+                child: Column(
+                  children: <Widget>[
+                    DeviceConnectionOverviewWidget(),
+                  ],
+                ))));
   }
 }

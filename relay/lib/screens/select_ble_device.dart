@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:relay/consts/styles.dart';
 import 'package:relay/l10n/app_localizations.dart';
 import 'package:relay/widgets/select_ble_device/scan_result_tile.dart';
 import 'package:relay/widgets/select_ble_device/system_device_tile.dart';
@@ -161,13 +162,16 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
         ),
       ),
       body: SafeArea(
-          child: RefreshIndicator(
-              child: ListView(children: <Widget>[
-                _buildSearchBar(context),
-                ..._buildSystemDeviceTiles(context),
-                ..._buildScanResultTiles(context),
-              ]),
-              onRefresh: _onRefresh)),
+        child: Container(
+            margin: ScaffoldCommonOptions.rootBodyMargin,
+            child: RefreshIndicator(
+                child: ListView(children: <Widget>[
+                  _buildSearchBar(context),
+                  ..._buildSystemDeviceTiles(context),
+                  ..._buildScanResultTiles(context),
+                ]),
+                onRefresh: _onRefresh)),
+      ),
       floatingActionButton: _buildScanButton(context),
     );
   }
