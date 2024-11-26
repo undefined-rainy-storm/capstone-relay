@@ -18,6 +18,7 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
   List<ScanResult> _scanResults = [];
 
   bool _isScanning = false;
+  final TextEditingController _searchController = TextEditingController();
 
   late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
   late StreamSubscription<bool> _isScanningSubscription;
@@ -105,25 +106,49 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
     }
   }
 
+  Widget _buildSearchBar(BuildContext context) {
+    return TextField(
+      controller: _searchController,
+      decoration: InputDecoration(
+        hintText: 'Search',
+        prefixIcon: const Icon(Icons.search),
+      ),
+    );
+  }
+
   List<Widget> _buildSystemDeviceTiles(BuildContext context) {
-    return _systemDevices
-        .map(
-          (d) => SystemDeviceTileWidget(
-            device: d,
-            onOpen: () => {},
-            onConnect: () => {},
-          ),
-        )
-        .toList();
+    String query = _searchController.text;
+    List<SystemDeviceTileWidget> widgets = [];
+    for (BluetoothDevice each in _systemDevices) {
+      if (query.isNotEmpty &&
+          !each.platformName.toLowerCase().contains(query.toLowerCase())) {
+        continue;
+      }
+      widgets.add(SystemDeviceTileWidget(
+        device: each,
+        onOpen: () => {},
+        onConnect: () => {},
+      ));
+    }
+    return widgets;
   }
 
   List<Widget> _buildScanResultTiles(BuildContext context) {
-    return _scanResults
-        .map((ScanResult result) => ScanResultTileWidget(
-              result: result,
-              onTap: () => {},
-            ))
-        .toList();
+    String query = _searchController.text;
+    List<ScanResultTileWidget> widgets = [];
+    for (ScanResult each in _scanResults) {
+      if (query.isNotEmpty &&
+          !each.device.platformName
+              .toLowerCase()
+              .contains(query.toLowerCase())) {
+        continue;
+      }
+      widgets.add(ScanResultTileWidget(
+        result: each,
+        onTap: () => {},
+      ));
+    }
+    return widgets;
   }
 
   @override
@@ -138,6 +163,7 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
       body: SafeArea(
           child: RefreshIndicator(
               child: ListView(children: <Widget>[
+                _buildSearchBar(context),
                 ..._buildSystemDeviceTiles(context),
                 ..._buildScanResultTiles(context),
               ]),
