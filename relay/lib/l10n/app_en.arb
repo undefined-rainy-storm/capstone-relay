@@ -13,8 +13,10 @@
     }
   },
   "configScreen_subtitleConnection": "Connection",
-  "configScreen_glassRemoteIdLabel": "Glass remote ID",
-  "configScreen_glassRemoteIdHint": "19B10000-E8F2-537E-4F6C-D104768A1214",
+  "configScreen_glassServiceUUIDLabel": "Glass service UUID",
+  "configScreen_glassServiceUUIDHint": "19B10000-E8F2-537E-4F6C-D104768A1214",
+  "configScreen_glassCharacteristicUUIDLabel": "Glass characteristic UUID",
+  "configScreen_glassCharacteristicUUIDHint": "19B10001-E8F2-537E-4F6C-D104768A1214",
   "configScreen_processorAddressLabel": "Processor address",
   "configScreen_processorAddressHint": "http://localhost:5000",
   "configScreen_loadQrConfigButtonText": "Scan QR code",

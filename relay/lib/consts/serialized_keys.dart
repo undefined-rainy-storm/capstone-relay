@@ -5,6 +5,9 @@ class Config {
 }
 
 class ConnectionConfig {
-  static const glassRemoteId = 'glass_remote_id';
+  static const glassCachedName = 'glass_cached_name';
+  static const glassServiceUUID = 'glass_service_uuid';
+  static const glassCharacteristicUUID = 'glass_characteristic_uuid';
+  static const processorName = 'processor_name';
   static const processorAddress = 'processor_address';
 }

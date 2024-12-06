@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:relay/models/classes/device.dart';
+import 'package:relay/models/classes/serializables/config.dart';
 import 'package:relay/models/enums/connection_status.dart';
 import 'package:relay/screens/config.dart';
 import 'package:relay/widgets/connection_state.dart';
@@ -14,6 +16,8 @@ class DeviceConnectionOverviewWidget extends StatefulWidget {
 
 class _DeviceConnectionOverviewWidgetState
     extends State<DeviceConnectionOverviewWidget> {
+  Config config = GetIt.I.get<Config>();
+
   Future<void> _navigateAndDisplayConfigScreen(BuildContext context) async {
     await Navigator.push(
       context,
@@ -36,8 +40,8 @@ class _DeviceConnectionOverviewWidgetState
                   style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
               ConnectionStateWidget(
                   target: Device(
-                      name: 'Arduino Nano 33 IoT',
-                      address: '19B10000-E8F2-537E-4F6C-D104768A1214'),
+                      name: config.connectionConfig.glassCachedName,
+                      address: config.connectionConfig.glassServiceUUID),
                   connectionStatus: ConnectionStatus.connecting)
             ],
           ),
@@ -49,7 +53,8 @@ class _DeviceConnectionOverviewWidgetState
                   style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
               ConnectionStateWidget(
                   target: Device(
-                      name: 'Server Unit #1', address: 'http://localhost:5000'),
+                      name: config.connectionConfig.processorName,
+                      address: config.connectionConfig.processorAddress),
                   connectionStatus: ConnectionStatus.connecting)
             ],
           ),

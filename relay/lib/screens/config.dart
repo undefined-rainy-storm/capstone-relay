@@ -13,9 +13,11 @@ class ConfigScreen extends StatefulWidget {
 }
 
 class _ConfigScreenState extends State<ConfigScreen> {
-  TextEditingController _connectionConfigGlassRemoteIdController =
+  TextEditingController _connectionConfigGlassServiceUUIDController =
       TextEditingController();
-  TextEditingController _connectionConfigProcessorAddress =
+  TextEditingController _connectionConfigGlassCharacteristicUUIDController =
+      TextEditingController();
+  TextEditingController _connectionConfigProcessorAddressController =
       TextEditingController();
 
   Future<void> _navigateAndDisplaySelectBleDeviceScreen(
@@ -32,9 +34,11 @@ class _ConfigScreenState extends State<ConfigScreen> {
   void initState() {
     super.initState();
     Config config = GetIt.I.get<Config>();
-    _connectionConfigGlassRemoteIdController.text =
-        config.connectionConfig.glassRemoteId;
-    _connectionConfigProcessorAddress.text =
+    _connectionConfigGlassServiceUUIDController.text =
+        config.connectionConfig.glassServiceUUID;
+    _connectionConfigGlassCharacteristicUUIDController.text =
+        config.connectionConfig.glassCharacteristicUUID;
+    _connectionConfigProcessorAddressController.text =
         config.connectionConfig.processorAddress;
   }
 
@@ -59,13 +63,32 @@ class _ConfigScreenState extends State<ConfigScreen> {
                       Column(
                         children: [
                           Text(AppLocalizations.of(context)!
-                              .configScreen_glassRemoteIdLabel),
+                              .configScreen_glassServiceUUIDLabel),
                           TextField(
                             controller:
-                                _connectionConfigGlassRemoteIdController,
+                                _connectionConfigGlassServiceUUIDController,
                             decoration: InputDecoration(
                                 hintText: AppLocalizations.of(context)!
-                                    .configScreen_glassRemoteIdHint,
+                                    .configScreen_glassServiceUUIDHint,
+                                suffixIcon: IconButton(
+                                    onPressed: () {
+                                      _navigateAndDisplaySelectBleDeviceScreen(
+                                          context);
+                                    },
+                                    icon: Icon(Icons.settings_bluetooth))),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(AppLocalizations.of(context)!
+                              .configScreen_glassCharacteristicUUIDLabel),
+                          TextField(
+                            controller:
+                                _connectionConfigGlassCharacteristicUUIDController,
+                            decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!
+                                    .configScreen_glassCharacteristicUUIDLabel,
                                 suffixIcon: IconButton(
                                     onPressed: () {
                                       _navigateAndDisplaySelectBleDeviceScreen(
@@ -80,7 +103,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
                           Text(AppLocalizations.of(context)!
                               .configScreen_processorAddressLabel),
                           TextField(
-                            controller: _connectionConfigProcessorAddress,
+                            controller:
+                                _connectionConfigProcessorAddressController,
                             decoration: InputDecoration(
                                 hintText: AppLocalizations.of(context)!
                                     .configScreen_processorAddressHint),

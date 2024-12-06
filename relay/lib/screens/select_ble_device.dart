@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:get_it/get_it.dart';
 import 'package:relay/consts/styles.dart';
 import 'package:relay/l10n/app_localizations.dart';
+import 'package:relay/models/classes/serializables/config.dart';
 import 'package:relay/widgets/select_ble_device/scan_result_tile.dart';
 import 'package:relay/widgets/select_ble_device/system_device_tile.dart';
 
@@ -19,6 +21,7 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
   List<ScanResult> _scanResults = [];
 
   bool _isScanning = false;
+  Config config = GetIt.I.get<Config>();
   final TextEditingController _searchController = TextEditingController();
 
   late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
@@ -118,38 +121,37 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
   }
 
   List<Widget> _buildSystemDeviceTiles(BuildContext context) {
-    String query = _searchController.text;
-    List<SystemDeviceTileWidget> widgets = [];
-    for (BluetoothDevice each in _systemDevices) {
-      if (query.isNotEmpty &&
-          !each.platformName.toLowerCase().contains(query.toLowerCase())) {
-        continue;
-      }
-      widgets.add(SystemDeviceTileWidget(
-        device: each,
-        onOpen: () => {},
-        onConnect: () => {},
-      ));
-    }
-    return widgets;
+    return _systemDevices
+        .where((device) => device.platformName
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase()))
+        .map((device) => SystemDeviceTileWidget(
+              device: device,
+              onOpen: () => {},
+              onConnect: () => {},
+            ))
+        .toList();
   }
 
   List<Widget> _buildScanResultTiles(BuildContext context) {
-    String query = _searchController.text;
-    List<ScanResultTileWidget> widgets = [];
-    for (ScanResult each in _scanResults) {
-      if (query.isNotEmpty &&
-          !each.device.platformName
-              .toLowerCase()
-              .contains(query.toLowerCase())) {
-        continue;
-      }
-      widgets.add(ScanResultTileWidget(
-        result: each,
-        onTap: () => {},
-      ));
-    }
-    return widgets;
+    return _scanResults
+        .where((result) => result.device.platformName
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase()))
+        .map((result) => ScanResultTileWidget(
+              result: result,
+              onTap: () => {
+                /*
+                config
+                    .connectionConfig
+                    .
+                    // Setter로 통과시킥;
+                    config
+                    .connectionConfig
+                    .glassRemoteId = result.device.remoteId.str,*/
+              },
+            ))
+        .toList();
   }
 
   @override
