@@ -28,6 +28,16 @@ class _ConfigScreenState extends State<ConfigScreen> {
     );
 
     if (!context.mounted) return;
+
+    setState(() {
+      Config config = GetIt.I.get<Config>();
+      _connectionConfigGlassServiceUUIDController.text =
+          config.connectionConfig.glassServiceUUID;
+      _connectionConfigGlassCharacteristicUUIDController.text =
+          config.connectionConfig.glassCharacteristicUUID;
+      _connectionConfigProcessorAddressController.text =
+          config.connectionConfig.processorAddress;
+    });
   }
 
   @override
@@ -42,7 +52,12 @@ class _ConfigScreenState extends State<ConfigScreen> {
         config.connectionConfig.processorAddress;
   }
 
-  void _saveButtonOnPressed() {}
+  void _saveButtonOnPressed() {
+    Config config = GetIt.I.get<Config>();
+    config.saveToSharedPrefs();
+
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {

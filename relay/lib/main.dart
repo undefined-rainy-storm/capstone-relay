@@ -11,6 +11,7 @@ GetIt getIt = GetIt.instance;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   getIt.registerSingleton<Config>(await Config.fromSharedPrefs());
+  getIt.allowReassignment = true;
   // await BLEForegroundService.initialize();
 
   runApp(MaterialApp(

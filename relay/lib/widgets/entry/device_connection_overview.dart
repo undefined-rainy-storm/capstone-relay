@@ -25,6 +25,10 @@ class _DeviceConnectionOverviewWidgetState
     );
 
     if (!context.mounted) return;
+
+    setState(() {
+      config = GetIt.I.get<Config>();
+    });
   }
 
   @override

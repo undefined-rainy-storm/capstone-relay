@@ -44,6 +44,35 @@ class ConnectionConfig {
     );
   }
 
+  Future<void> saveToSharedPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        sk.config
+            .appendChild(sk.Config.connectionConfig)
+            .appendChild(sk.ConnectionConfig.glassCachedName),
+        glassCachedName);
+    await prefs.setString(
+        sk.config
+            .appendChild(sk.Config.connectionConfig)
+            .appendChild(sk.ConnectionConfig.glassServiceUUID),
+        glassServiceUUID);
+    await prefs.setString(
+        sk.config
+            .appendChild(sk.Config.connectionConfig)
+            .appendChild(sk.ConnectionConfig.glassCharacteristicUUID),
+        glassCharacteristicUUID);
+    await prefs.setString(
+        sk.config
+            .appendChild(sk.Config.connectionConfig)
+            .appendChild(sk.ConnectionConfig.processorName),
+        processorName);
+    await prefs.setString(
+        sk.config
+            .appendChild(sk.Config.connectionConfig)
+            .appendChild(sk.ConnectionConfig.processorAddress),
+        processorAddress);
+  }
+
   factory ConnectionConfig.fromJson(Map<String, dynamic> json) {
     return ConnectionConfig(
       glassCachedName: json[sk.ConnectionConfig.glassCachedName],

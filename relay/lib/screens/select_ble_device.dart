@@ -97,6 +97,11 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
 
   Future<void> _onScanStopPressed() async => await stopScan();
 
+  Future<void> _onConnectPressed(BluetoothDevice device) async {
+    GetIt.I<Config>().bleDevice = device;
+    Navigator.of(context).pop();
+  }
+
   Widget _buildScanButton(BuildContext context) {
     if (FlutterBluePlus.isScanningNow) {
       return FloatingActionButton(
@@ -127,8 +132,8 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
             .contains(_searchController.text.toLowerCase()))
         .map((device) => SystemDeviceTileWidget(
               device: device,
-              onOpen: () => {},
-              onConnect: () => {},
+              onOpen: () => _onConnectPressed(device),
+              onConnect: () => _onConnectPressed(device),
             ))
         .toList();
   }
@@ -141,6 +146,7 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
         .map((result) => ScanResultTileWidget(
               result: result,
               onTap: () => {
+                _onConnectPressed(result.device),
                 /*
                 config
                     .connectionConfig
