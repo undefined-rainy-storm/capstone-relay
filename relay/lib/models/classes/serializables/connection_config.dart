@@ -6,6 +6,7 @@ import 'package:relay/consts/serialized_keys.dart' as sk;
 
 class ConnectionConfig {
   String glassCachedName;
+  String glassRemoteId;
   String glassServiceUUID;
   String glassCharacteristicUUID;
   String processorName;
@@ -13,6 +14,7 @@ class ConnectionConfig {
 
   ConnectionConfig(
       {required this.glassCachedName,
+      required this.glassRemoteId,
       required this.glassServiceUUID,
       required this.glassCharacteristicUUID,
       required this.processorName,
@@ -25,6 +27,10 @@ class ConnectionConfig {
               .appendChild(sk.Config.connectionConfig)
               .appendChild(sk.ConnectionConfig.glassCachedName)) ??
           defaults.ConnectionConfig.glassCachedName,
+      glassRemoteId: prefs.getString(sk.config
+              .appendChild(sk.Config.connectionConfig)
+              .appendChild(sk.ConnectionConfig.glassRemoteId)) ??
+          defaults.ConnectionConfig.glassRemoteId,
       glassServiceUUID: prefs.getString(sk.config
               .appendChild(sk.Config.connectionConfig)
               .appendChild(sk.ConnectionConfig.glassServiceUUID)) ??
@@ -54,6 +60,11 @@ class ConnectionConfig {
     await prefs.setString(
         sk.config
             .appendChild(sk.Config.connectionConfig)
+            .appendChild(sk.ConnectionConfig.glassRemoteId),
+        glassRemoteId);
+    await prefs.setString(
+        sk.config
+            .appendChild(sk.Config.connectionConfig)
             .appendChild(sk.ConnectionConfig.glassServiceUUID),
         glassServiceUUID);
     await prefs.setString(
@@ -76,6 +87,7 @@ class ConnectionConfig {
   factory ConnectionConfig.fromJson(Map<String, dynamic> json) {
     return ConnectionConfig(
       glassCachedName: json[sk.ConnectionConfig.glassCachedName],
+      glassRemoteId: json[sk.ConnectionConfig.glassRemoteId],
       glassServiceUUID: json[sk.ConnectionConfig.glassServiceUUID],
       glassCharacteristicUUID:
           json[sk.ConnectionConfig.glassCharacteristicUUID],
@@ -86,6 +98,7 @@ class ConnectionConfig {
 
   Map<String, dynamic> toJson() => {
         sk.ConnectionConfig.glassCachedName: glassCachedName,
+        sk.ConnectionConfig.glassRemoteId: glassRemoteId,
         sk.ConnectionConfig.glassServiceUUID: glassServiceUUID,
         sk.ConnectionConfig.glassCharacteristicUUID: glassCharacteristicUUID,
         sk.ConnectionConfig.processorName: processorName,

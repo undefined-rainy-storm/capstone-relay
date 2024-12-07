@@ -13,12 +13,28 @@ class ConfigScreen extends StatefulWidget {
 }
 
 class _ConfigScreenState extends State<ConfigScreen> {
+  TextEditingController _connectionConfigGlassRemoteIdController =
+      TextEditingController();
   TextEditingController _connectionConfigGlassServiceUUIDController =
       TextEditingController();
   TextEditingController _connectionConfigGlassCharacteristicUUIDController =
       TextEditingController();
   TextEditingController _connectionConfigProcessorAddressController =
       TextEditingController();
+
+  void _reloadConfig() {
+    setState(() {
+      Config config = GetIt.I.get<Config>();
+      config.connectionConfig.glassRemoteId =
+          _connectionConfigGlassRemoteIdController.text;
+      config.connectionConfig.glassServiceUUID =
+          _connectionConfigGlassServiceUUIDController.text;
+      config.connectionConfig.glassCharacteristicUUID =
+          _connectionConfigGlassCharacteristicUUIDController.text;
+      config.connectionConfig.processorAddress =
+          _connectionConfigProcessorAddressController.text;
+    });
+  }
 
   Future<void> _navigateAndDisplaySelectBleDeviceScreen(
       BuildContext context) async {
@@ -29,27 +45,13 @@ class _ConfigScreenState extends State<ConfigScreen> {
 
     if (!context.mounted) return;
 
-    setState(() {
-      Config config = GetIt.I.get<Config>();
-      _connectionConfigGlassServiceUUIDController.text =
-          config.connectionConfig.glassServiceUUID;
-      _connectionConfigGlassCharacteristicUUIDController.text =
-          config.connectionConfig.glassCharacteristicUUID;
-      _connectionConfigProcessorAddressController.text =
-          config.connectionConfig.processorAddress;
-    });
+    _reloadConfig();
   }
 
   @override
   void initState() {
     super.initState();
-    Config config = GetIt.I.get<Config>();
-    _connectionConfigGlassServiceUUIDController.text =
-        config.connectionConfig.glassServiceUUID;
-    _connectionConfigGlassCharacteristicUUIDController.text =
-        config.connectionConfig.glassCharacteristicUUID;
-    _connectionConfigProcessorAddressController.text =
-        config.connectionConfig.processorAddress;
+    _reloadConfig();
   }
 
   void _saveButtonOnPressed() {
@@ -78,6 +80,20 @@ class _ConfigScreenState extends State<ConfigScreen> {
                       Column(
                         children: [
                           Text(AppLocalizations.of(context)!
+                              .configScreen_glassRemoteIdLabel),
+                          TextField(
+                            controller:
+                                _connectionConfigGlassRemoteIdController,
+                            decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!
+                                    .configScreen_glassRemoteIdHint),
+                          ),
+                        ],
+                      ),
+                      // ConnectionConfig: GlassServiceUUID
+                      Column(
+                        children: [
+                          Text(AppLocalizations.of(context)!
                               .configScreen_glassServiceUUIDLabel),
                           TextField(
                             controller:
@@ -94,6 +110,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
                           ),
                         ],
                       ),
+                      // ConnectionConfig: GlassCharacteristicUUID
                       Column(
                         children: [
                           Text(AppLocalizations.of(context)!

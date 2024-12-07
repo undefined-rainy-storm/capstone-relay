@@ -46,8 +46,6 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
         setState(() {});
       }
     });
-
-    startScan();
   }
 
   @override
@@ -98,7 +96,7 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
   Future<void> _onScanStopPressed() async => await stopScan();
 
   Future<void> _onConnectPressed(BluetoothDevice device) async {
-    GetIt.I<Config>().bleDevice = device;
+    Config.setBleDevice(device);
     Navigator.of(context).pop();
   }
 
@@ -132,7 +130,7 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
             .contains(_searchController.text.toLowerCase()))
         .map((device) => SystemDeviceTileWidget(
               device: device,
-              onOpen: () => _onConnectPressed(device),
+              onOpen: () => Navigator.pop(context),
               onConnect: () => _onConnectPressed(device),
             ))
         .toList();

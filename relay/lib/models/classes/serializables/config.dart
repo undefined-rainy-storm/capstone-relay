@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:get_it/get_it.dart';
+import 'package:relay/models/classes/extensions/bluetooth_device.dart';
 import 'package:relay/models/classes/serializables/connection_config.dart';
 
 const String jsonSerializedKeyConfig = 'config';
@@ -32,8 +36,29 @@ class Config {
         JsonSerializedKeysConfig.connectionConfig: connectionConfig.toJson(),
       };
 
-  set bleDevice(BluetoothDevice device) {
-    connectionConfig.glassCachedName = device.advName;
-    connectionConfig.glassServiceUUID = device.remoteId.toString();
+  static Future<void> setBleDevice(BluetoothDevice device) async {
+    final Config config = GetIt.I.get<Config>();
+    Timer.run(() => print('Connecting to ${device.advName}'));
+    device.connectAndUpdateStream().catchError((e) {
+      print('Error: $e');
+    });
+    Timer.run(() => print('Connected to ${device.advName}'));
+
+    config.connectionConfig.glassCachedName = device.advName;
+    config.connectionConfig.glassRemoteId = device.remoteId.toString();
+    Timer.run(() => print('${config.connectionConfig.toJson()}'));
+
+    List<BluetoothService> services = await device.discoverServices();
+    if (services.length > 0) {
+      BluetoothService service = services.first;
+      config.connectionConfig.glassServiceUUID = service.uuid.toString();
+      List<BluetoothCharacteristic> characteristics =
+          await service.characteristics;
+      if (characteristics.length > 0) {
+        BluetoothCharacteristic characteristic = characteristics.first;
+        config.connectionConfig.glassCharacteristicUUID =
+            characteristic.uuid.toString();
+      }
+    }
   }
 }
