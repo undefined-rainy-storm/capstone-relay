@@ -48,6 +48,7 @@ class Config {
     config.connectionConfig.glassRemoteId = device.remoteId.toString();
     Timer.run(() => print('${config.connectionConfig.toJson()}'));
 
+    await device.connect();
     List<BluetoothService> services = await device.discoverServices();
     if (services.length > 0) {
       BluetoothService service = services.first;
