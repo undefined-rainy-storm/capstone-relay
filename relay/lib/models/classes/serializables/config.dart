@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:get_it/get_it.dart';
 import 'package:relay/models/classes/extensions/bluetooth_device.dart';
 import 'package:relay/models/classes/serializables/connection_config.dart';
 
@@ -22,7 +21,7 @@ class Config {
     );
   }
 
-  void saveToSharedPrefs() async {
+  Future<void> saveToSharedPrefs() async {
     await connectionConfig.saveToSharedPrefs();
   }
 
@@ -36,30 +35,35 @@ class Config {
         JsonSerializedKeysConfig.connectionConfig: connectionConfig.toJson(),
       };
 
-  static Future<void> setBleDevice(BluetoothDevice device) async {
-    final Config config = GetIt.I.get<Config>();
-    Timer.run(() => print('Connecting to ${device.advName}'));
-    device.connectAndUpdateStream().catchError((e) {
-      print('Error: $e');
-    });
-    Timer.run(() => print('Connected to ${device.advName}'));
-
-    config.connectionConfig.glassCachedName = device.advName;
-    config.connectionConfig.glassRemoteId = device.remoteId.toString();
-    Timer.run(() => print('${config.connectionConfig.toJson()}'));
-
+  Future<void> setDevice(BluetoothDevice device) async {
+    Timer.run(() => print('Connecting to ${device.platformName}'));
     await device.connect();
+    Timer.run(() => print('Connected to ${device.platformName}'));
+
+    connectionConfig.glassCachedName = device.platformName;
+    connectionConfig.glassRemoteId = device.remoteId.toString();
+    await saveToSharedPrefs();
+    Timer.run(() => print('${connectionConfig.toJson()}'));
+
     List<BluetoothService> services = await device.discoverServices();
-    if (services.length > 0) {
+    if (services.isNotEmpty) {
       BluetoothService service = services.first;
-      config.connectionConfig.glassServiceUUID = service.uuid.toString();
-      List<BluetoothCharacteristic> characteristics =
-          await service.characteristics;
-      if (characteristics.length > 0) {
+      connectionConfig.glassServiceUUID = service.uuid.toString();
+      List<BluetoothCharacteristic> characteristics = service.characteristics;
+      if (characteristics.isNotEmpty) {
         BluetoothCharacteristic characteristic = characteristics.first;
-        config.connectionConfig.glassCharacteristicUUID =
+        connectionConfig.glassCharacteristicUUID =
             characteristic.uuid.toString();
       }
     }
+    await saveToSharedPrefs();
+  }
+
+  Future<void> resetDevice() async {
+    connectionConfig.glassCachedName = '';
+    connectionConfig.glassRemoteId = '';
+    connectionConfig.glassServiceUUID = '';
+    connectionConfig.glassCharacteristicUUID = '';
+    await saveToSharedPrefs();
   }
 }

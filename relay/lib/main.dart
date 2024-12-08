@@ -2,24 +2,26 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 
 import 'package:relay/l10n/app_localizations.dart';
 import 'package:relay/models/classes/serializables/config.dart';
+import 'package:relay/providers/config_provider.dart';
 import 'package:relay/screens/bluetooth_off_screen.dart';
 import 'package:relay/screens/entry.dart';
 import 'package:relay/services/background_entrypoint.dart'
     as background_entrypoint;
 
-GetIt getIt = GetIt.instance;
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  getIt.registerSingleton<Config>(await Config.fromSharedPrefs());
-  getIt.allowReassignment = true;
+
   await background_entrypoint.initializeService();
 
-  runApp(MainApp());
+  final configProvider = ConfigProvider(await Config.fromSharedPrefs());
+
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => configProvider),
+  ], child: MainApp()));
 }
 
 class MainApp extends StatefulWidget {

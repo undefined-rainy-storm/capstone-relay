@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:get_it/get_it.dart';
+import 'package:relay/exceptions/bluetooth_handler.dart';
 import 'package:relay/models/classes/serializables/config.dart';
 import 'package:relay/services/bluetooth_handler.dart';
+import 'package:relay/services/background_bluetooth_handler.dart'
+    as background_handler;
 
 void startBackgroundService() {
   final service = FlutterBackgroundService();
@@ -45,47 +48,38 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 
 @pragma('vm:entry-point')
 Future<void> onStart(ServiceInstance service) async {
-  if (!(GetIt.I.isRegistered<Config>())) {
-    GetIt.I.registerSingleton<Config>(await Config.fromSharedPrefs());
-  }
-
   if (await FlutterBluePlus.isSupported == false) {
-    print('Bluetooth is not supported');
-    return;
+    throw BluetoothNotSupportedException();
   }
 
-  try {
-    if (Platform.isIOS) {
-      // Wait for Bluetooth adapter state on iOS
-      await FlutterBluePlus.adapterState
-          .where((state) => state == BluetoothAdapterState.on)
-          .first
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () => throw TimeoutException('Bluetooth not ready'),
-          );
+  if (Platform.isIOS) {
+    await FlutterBluePlus.adapterState
+        .where((state) => state == BluetoothAdapterState.on)
+        .first
+        .timeout(
+          const Duration(seconds: 10),
+          onTimeout: () => throw BluetoothAdapterStateIsNotOnException(),
+        );
+  }
+  if (Platform.isAndroid) {
+    await FlutterBluePlus.turnOn();
+  }
+  log('Bluetooth is supported and adapter state is on');
 
-      // iOS requires only system permissions dialog, no explicit request needed
-      await Future.delayed(const Duration(seconds: 1));
+  // BluetoothHandler -> call establishAutoConnection
+  while (true) {
+    try {
+      await BluetoothHandler().establishAutoConnection();
+      break;
+    } on BluetoothHandlerException catch (e) {
+      log('Error establishing auto connection: $e. Retrying in 5 seconds');
+      await Future.delayed(const Duration(seconds: 5));
     }
-
-    if (Platform.isAndroid) {
-      await FlutterBluePlus.turnOn();
-    }
-
-    print('BLE initialized, connecting to stored device...');
-    await BluetoothHandler.connectToStoredDevice();
-  } catch (e) {
-    Timer.run(() => print('BLE initialization error: $e'));
   }
 
-  print('Started');
-
-  BluetoothHandler.connectToStoredDevice();
-
-  Timer.periodic(const Duration(seconds: 1), (timer) {
-    Config config = GetIt.I.get<Config>();
-    print('${DateTime.now()}: ${config.toJson()}');
-    print("service is successfully running ${DateTime.now().second}");
-  });
+  BluetoothHandler().characteristic!.setNotifyValue(true);
+  BluetoothHandler()
+      .characteristic!
+      .lastValueStream
+      .listen((data) => background_handler.onDataReceived(data, service));
 }
