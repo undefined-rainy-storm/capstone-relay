@@ -11,6 +11,7 @@ import 'package:relay/models/classes/serializables/config.dart';
 import 'package:relay/services/bluetooth_handler.dart';
 import 'package:relay/services/background_bluetooth_handler.dart'
     as background_handler;
+import 'package:relay/utilities/io.dart';
 
 void startBackgroundService() {
   final service = FlutterBackgroundService();
@@ -66,6 +67,8 @@ Future<void> onStart(ServiceInstance service) async {
   }
   log('Bluetooth is supported and adapter state is on');
 
+  printout('Starting background service');
+
   // BluetoothHandler -> call establishAutoConnection
   while (true) {
     try {
@@ -73,13 +76,24 @@ Future<void> onStart(ServiceInstance service) async {
       break;
     } on BluetoothHandlerException catch (e) {
       log('Error establishing auto connection: $e. Retrying in 5 seconds');
+      printout('Error establishing auto connection: $e. Retrying in 5 seconds');
       await Future.delayed(const Duration(seconds: 5));
     }
   }
 
-  BluetoothHandler().characteristic!.setNotifyValue(true);
-  BluetoothHandler()
+  // BluetoothHandler().characteristic!.setNotifyValue(true);
+  StreamSubscription streamSubscription = BluetoothHandler()
       .characteristic!
       .lastValueStream
       .listen((data) => background_handler.onDataReceived(data, service));
+
+/*
+  Timer.periodic(Duration(seconds: 1), (timer) async {
+    Config config = await Config.fromSharedPrefs();
+    printout('${DateTime.now()}');
+    printout('$streamSubscription');
+    printout('${streamSubscription.isPaused}');
+    printout('${BluetoothHandler().characteristic!.lastValue}');
+    printout('${config.toJson()}');
+  });*/
 }

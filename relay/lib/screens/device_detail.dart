@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:relay/exceptions/bluetooth_handler.dart';
-import 'package:relay/models/classes/extensions/bluetooth_device.dart';
 import 'package:relay/providers/config_provider.dart';
 import 'package:relay/services/bluetooth_handler.dart';
 import 'package:relay/widgets/select_ble_device/characteristic_tile.dart';
@@ -60,27 +59,13 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         setState(() {});
       }
     });
-
-    _isConnectingSubscription = widget.device.isConnecting.listen((value) {
-      _isConnecting = value;
-      if (mounted) {
-        setState(() {});
-      }
-    });
-
-    _isDisconnectingSubscription =
-        widget.device.isDisconnecting.listen((value) {
-      _isDisconnecting = value;
-      if (mounted) {
-        setState(() {});
-      }
-    });
   }
 
   @override
   void dispose() {
-    _connectionStateSubscription.cancel();
-    _mtuSubscription.cancel();
+    if (_connectionStateSubscription != null) {
+      _connectionStateSubscription.cancel();
+    }
     _isConnectingSubscription.cancel();
     _isDisconnectingSubscription.cancel();
     super.dispose();
@@ -144,18 +129,21 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
           (s) => ServiceTile(
             service: s,
             characteristicTiles: s.characteristics
-                .map((c) => _buildCharacteristicTile(c))
+                .map((c) => _buildCharacteristicTile(s, c))
                 .toList(),
           ),
         )
         .toList();
   }
 
-  CharacteristicTile _buildCharacteristicTile(BluetoothCharacteristic c) {
+  CharacteristicTile _buildCharacteristicTile(
+      BluetoothService s, BluetoothCharacteristic c) {
     return CharacteristicTile(
+      device: widget.device,
       characteristic: c,
       descriptorTiles:
           c.descriptors.map((d) => DescriptorTile(descriptor: d)).toList(),
+      service: s,
     );
   }
 

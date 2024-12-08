@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:relay/models/classes/extensions/bluetooth_device.dart';
 import 'package:relay/models/classes/serializables/connection_config.dart';
 
 const String jsonSerializedKeyConfig = 'config';
@@ -34,6 +33,19 @@ class Config {
   Map<String, dynamic> toJson() => {
         JsonSerializedKeysConfig.connectionConfig: connectionConfig.toJson(),
       };
+
+  set device(BluetoothDevice device) {
+    connectionConfig.glassCachedName = device.platformName;
+    connectionConfig.glassRemoteId = device.remoteId.toString();
+  }
+
+  set service(BluetoothService service) {
+    connectionConfig.glassServiceUUID = service.uuid.toString();
+  }
+
+  set characteristic(BluetoothCharacteristic characteristic) {
+    connectionConfig.glassCharacteristicUUID = characteristic.uuid.toString();
+  }
 
   Future<void> setDevice(BluetoothDevice device) async {
     Timer.run(() => print('Connecting to ${device.platformName}'));

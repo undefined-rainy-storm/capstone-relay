@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:relay/exceptions/bluetooth_handler.dart';
 import 'package:relay/models/classes/serializables/config.dart';
+import 'package:relay/utilities/io.dart';
 
 class BluetoothHandler {
   BluetoothHandler._();
@@ -36,6 +37,9 @@ class BluetoothHandler {
     }
 
     Config config = await Config.fromSharedPrefs();
+    printout(
+        'Establishing connection to stored device: ${_device!.platformName}');
+    printout('${config.toJson()}');
     if (config.connectionConfig.glassServiceUUID.isEmpty) {
       throw StoredDeviceServiceIsNotExistsException();
     }
@@ -47,6 +51,13 @@ class BluetoothHandler {
     // Start handling the service and characteristic
 
     for (BluetoothService eachService in await _device!.discoverServices()) {
+      for (BluetoothCharacteristic each in eachService.characteristics) {
+        each.lastValueStream.listen((event) {
+          printout(
+              '${eachService.uuid.toString()} ${each.uuid.toString()} ${DateTime.now()} // ${each.lastValue}');
+        });
+      }
+
       if (eachService.uuid.toString() ==
           config.connectionConfig.glassServiceUUID) {
         _service = eachService;
@@ -55,6 +66,9 @@ class BluetoothHandler {
           if (eachCharacteristic.uuid.toString() ==
               config.connectionConfig.glassCharacteristicUUID) {
             _characteristic = eachCharacteristic;
+            printout('Connected to ${_device!.platformName}');
+            printout('Service: ${_service!.uuid}');
+            printout('Characteristic: ${_characteristic!.uuid}');
             return;
           }
         }

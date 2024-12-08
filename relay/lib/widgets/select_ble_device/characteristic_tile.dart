@@ -1,44 +1,78 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:math' as math;
 import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:provider/provider.dart';
+import 'package:relay/models/classes/serializables/config.dart';
+import 'package:relay/providers/config_provider.dart';
 
 import 'package:relay/widgets/select_ble_device/descriptor_tile.dart';
 
 class CharacteristicTile extends StatefulWidget {
+  final BluetoothDevice device;
+  final BluetoothService service;
   final BluetoothCharacteristic characteristic;
   final List<DescriptorTile> descriptorTiles;
 
   const CharacteristicTile(
-      {super.key, required this.characteristic, required this.descriptorTiles});
+      {super.key,
+      required this.device,
+      required this.service,
+      required this.characteristic,
+      required this.descriptorTiles});
 
   @override
   State<CharacteristicTile> createState() => _CharacteristicTileState();
 }
 
 class _CharacteristicTileState extends State<CharacteristicTile> {
-  List<int> _value = [];
-
-  late StreamSubscription<List<int>> _lastValueSubscription;
+  List<int> _lastValue = [];
+  Timer? _readTimer;
+  static const _readInterval = Duration(milliseconds: 25);
 
   @override
   void initState() {
     super.initState();
-    _lastValueSubscription =
-        widget.characteristic.lastValueStream.listen((value) {
-      _value = value;
-      if (mounted) {
-        setState(() {});
-      }
-    });
+    _startPeriodicRead();
   }
 
   @override
   void dispose() {
-    _lastValueSubscription.cancel();
+    _readTimer?.cancel();
     super.dispose();
+  }
+
+  void _startPeriodicRead() {
+    /*
+    _readTimer = Timer.periodic(_readInterval, (timer) async {
+      log('asdf');
+      if (c.properties.read) {
+        try {
+          await onReadPressed();
+          setState(() {
+            _lastValue = c.lastValue;
+            log('Periodic read: $_lastValue');
+          });
+        } catch (e) {
+          developer.log('Periodic read error: $e');
+        }
+      }
+    });*/
+  }
+
+  Widget _buildValue() {
+    if (_lastValue == null) return Text('No value');
+
+    return Text(
+      'Value: ${String.fromCharCodes(_lastValue!)}',
+      style: TextStyle(
+        fontSize: 14,
+        color: Colors.blue,
+      ),
+    );
   }
 
   BluetoothCharacteristic get c => widget.characteristic;
@@ -60,6 +94,14 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
     } catch (e) {
       developer.log('Read Error: $e');
     }
+  }
+
+  void onSelectPressed(BuildContext context) {
+    Config config = context.read<ConfigProvider>().config;
+    config.device = widget.device;
+    config.service = widget.service;
+    config.characteristic = widget.characteristic;
+    Navigator.of(context).pop();
   }
 
   Future onWritePressed() async {
@@ -96,9 +138,15 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
     return Text(uuid, style: TextStyle(fontSize: 13));
   }
 
-  Widget buildValue(BuildContext context) {
-    String data = _value.toString();
-    return Text(data, style: TextStyle(fontSize: 13, color: Colors.grey));
+  Widget buildSelectButton(BuildContext context) {
+    return TextButton(
+        child: Text('Select'),
+        onPressed: () async {
+          onSelectPressed(context);
+          if (mounted) {
+            setState(() {});
+          }
+        });
   }
 
   Widget buildReadButton(BuildContext context) {
@@ -144,6 +192,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        buildSelectButton(context),
         if (read) buildReadButton(context),
         if (write) buildWriteButton(context),
         if (notify || indicate) buildSubscribeButton(context),
@@ -161,7 +210,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
           children: <Widget>[
             const Text('Characteristic'),
             buildUuid(context),
-            buildValue(context),
+            _buildValue(),
           ],
         ),
         subtitle: buildButtonRow(context),
