@@ -1,4 +1,4 @@
-import 'package:relay/models/exceptions/enums.dart';
+import 'package:relay/exceptions/enums.dart';
 
 enum Emotion {
   happy,

@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 import 'package:relay/consts/styles.dart';
 import 'package:relay/l10n/app_localizations.dart';
 import 'package:relay/models/classes/serializables/config.dart';
+import 'package:relay/providers/config_provider.dart';
+import 'package:relay/screens/device_detail.dart';
 import 'package:relay/widgets/select_ble_device/scan_result_tile.dart';
 import 'package:relay/widgets/select_ble_device/system_device_tile.dart';
 
@@ -21,7 +23,6 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
   List<ScanResult> _scanResults = [];
 
   bool _isScanning = false;
-  Config config = GetIt.I.get<Config>();
   final TextEditingController _searchController = TextEditingController();
 
   late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
@@ -46,8 +47,6 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
         setState(() {});
       }
     });
-
-    startScan();
   }
 
   @override
@@ -97,9 +96,13 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
 
   Future<void> _onScanStopPressed() async => await stopScan();
 
-  Future<void> _onConnectPressed(BluetoothDevice device) async {
-    GetIt.I<Config>().bleDevice = device;
-    Navigator.of(context).pop();
+  Future<void> _onConnectPressed(
+      BuildContext context, BluetoothDevice device) async {
+    context.read<ConfigProvider>().config.setDevice(device);
+    MaterialPageRoute route = MaterialPageRoute(
+        builder: (context) => DeviceDetailScreen(device: device));
+    Navigator.of(context).push(route);
+    // Navigator.of(context).pop();
   }
 
   Widget _buildScanButton(BuildContext context) {
@@ -132,8 +135,9 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
             .contains(_searchController.text.toLowerCase()))
         .map((device) => SystemDeviceTileWidget(
               device: device,
-              onOpen: () => _onConnectPressed(device),
-              onConnect: () => _onConnectPressed(device),
+              onOpen: () =>
+                  _onConnectPressed(context, device), // Navigator.pop(context),
+              onConnect: () => _onConnectPressed(context, device),
             ))
         .toList();
   }
@@ -146,7 +150,7 @@ class _SelectBleDeviceScreenState extends State<SelectBleDeviceScreen> {
         .map((result) => ScanResultTileWidget(
               result: result,
               onTap: () => {
-                _onConnectPressed(result.device),
+                _onConnectPressed(context, result.device),
                 /*
                 config
                     .connectionConfig
